@@ -1,5 +1,5 @@
 const sql = require('mssql');
-var host = '192.168.0.104', port = "1433", user = 'SA', password = '@Vtr7122349'// database = 'db_sistema';
+var host = '192.168.0.25', port = "1433", user = 'SA', password = '@Vtr7122349'// database = 'db_sistema';
 const connStr = `Server=${host};User Id=${user};Password=${password};`;//Database=${database};
 
 var connected = false;
@@ -57,10 +57,10 @@ module.exports = {
                 connected = true;
                 console.log("Conectado");
                 for (var i in create_db) {
-                    // module.exports.execute(create_db[i])
+                    // module.exports.execute(create_db[i]) //
                 }
                 console.log("Base de dados criada");
-                // module.exports.createProc();
+                // module.exports.createProc(); //
             })
             .catch(err => console.log("erro! " + err));
     },
