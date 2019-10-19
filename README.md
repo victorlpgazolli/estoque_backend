@@ -37,7 +37,7 @@ __Endpoints:__
         </tr>
         <tr>
             <td><strong>Atualizar</strong></td>
-            <td>/user/alterSenha</td>
+            <td></td>
             <td>/category/alter</td>
             <td>
                 <div>
@@ -60,6 +60,13 @@ __Endpoints:__
         <tr>
             <td><strong>Login</strong></td>
             <td>/user/login</td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td><strong>Atualizar Senha</strong></td>
+            <td>/user/alterSenha</td>
             <td></td>
             <td></td>
             <td></td>
