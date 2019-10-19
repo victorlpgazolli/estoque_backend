@@ -14,13 +14,14 @@ O nosso projeto conta com 3 pilares: o banco de dados, o servidor e a aplicaçã
 ### API:
 O servidor faz um papel crucial no projeto: fazer uma "ponte" entre o aplicativo e o banco de dados. Ele conta com uma API, na qual é chamada para cadastrar os registros no banco, os endpoints da api estão listados a seguir:
 
+__Endpoints:__
 <table>
     <tbody>
         <tr>
-            <td>Açãoo</td>
-            <td>Usuário</td>
-            <td>Categoria</td>
-            <td>Produto</td>
+            <td>Ação</td>
+            <td><strong>Usuário</strong></td>
+            <td><strong>Categoria</strong></td>
+            <td><strong>Produto</strong></td>
             <td></td>
         </tr>
         <tr>
