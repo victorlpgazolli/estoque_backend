@@ -1,6 +1,6 @@
 const sql = require('mssql');
-var host = '192.168.0.25', port = "1433", user = 'SA', password = '@Vtr7122349'// database = 'db_sistema';
-const connStr = `Server=${host};User Id=${user};Password=${password};`;//Database=${database};
+var host = 'localhost\\SQLEXPRESS', port = "1433", user = 'SA', password = '@Estoque123456789', database = 'db_sistema';
+const connStr = `Server=${host};User Id=${user};Password=${password};Database=${database}`;
 
 var connected = false;
 var conn;
@@ -38,7 +38,7 @@ var CREATE_sp_AddProduto = `CREATE PROCEDURE sp_AddProduto @NomeProduto varchar(
 var CREATE_sp_AlterProduto = `CREATE PROCEDURE sp_AlterProduto @codigoProduto int, @NomeProduto varchar(40)='', @ValorAtual float=' ', @QtdMinima int =' ', @QtdAtual int =' ', @Categoria int =' ', @Imagem varbinary(max) = null as update tb_produto set nm_produto = @NomeProduto, vl_produto_atual = @ValorAtual, qt_produto_min = @QtdMinima, qt_produto_atual = @QtdAtual, fk_categoria=@Categoria, im_produto = @Imagem where cd_produto = @codigoProduto;`
 var CREATE_sp_DeleteProduto = `CREATE PROCEDURE sp_DeleteProduto @codigoProduto int as delete tb_produto where cd_produto = @codigoProduto;`
 var CREATE_sp_SelectProduto = `CREATE PROCEDURE sp_SelectProduto @NomeProduto varchar(40)=' ', @ValorAtual float=' ', @QtdMinima int =' ' as select * from tb_produto where nm_produto = @NomeProduto, vl_produto_atual = @ValorAtual, qt_produto_min = @QtdMinima;`
-// operacao
+// operacaos
 var CREATE_sp_AddOperacao = `CREATE PROCEDURE sp_AddOperacao @NomeOperacao varchar(40) as if((select count(cd_operacao) from tb_operacao where nm_operacao=@NomeOperacao)=0) begin insert into tb_operacao values(@NomeOperacao) end else begin print 'Operacao ja existente' end;`
 var CREATE_sp_AlterOperacao = `CREATE PROCEDURE sp_AlterOperacao @CodigoOperacao int, @NomeOperacao varchar(40) as update tb_operacao set nm_operacao = @NomeOperacao where cd_operacao = @CodigoOperacao;`
 var CREATE_sp_DeleteOperacao = `CREATE PROCEDURE sp_DeleteOperacao @Codigo int as delete tb_operacao where cd_operacao = @Codigo;`
@@ -51,7 +51,7 @@ procedures.push(CREATE_sp_Login, CREATE_sp_addUsuario, CREATE_sp_AddCategoria, C
 
 module.exports = {
     createDB() {
-        sql.connect(connStr)
+        sql.connect(`mssql://${user}:${password}@localhost/${database}`)
             .then(_conn => {
                 conn = _conn;
                 connected = true;
