@@ -7,7 +7,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "nodemon index.js",
     "env-up": "docker-compose up --build",
-    "env-down": "docker-compose down"
+    "env-down": "docker-compose down",
+    "server": "autossh -M 0 -o 'ServerAliveInterval 30' -o 'ServerAliveCountMax 5' -R estoque_backend.serveo.net:80:localhost:3000 serveo.net"
   },
   "author": "",
   "license": "ISC",
