@@ -13,31 +13,58 @@ O nosso projeto conta com 3 pilares: o banco de dados, o servidor e a aplicaçã
 
 ### API:
 O servidor faz um papel crucial no projeto: fazer uma "ponte" entre o aplicativo e o banco de dados. Ele conta com uma API, na qual é chamada para cadastrar os registros no banco, os endpoints da api estão listados a seguir:
-|   Ação    |
-|-----------|
-|   Criar   |
-| Atualizar |
-| Apagar    |
-<!-- <table>
-    <thead>
-    <th>
-    Usuário
-    </th>
-    <th>
-    Categoria
-    </th>
-    <th>
-    Produtos
-    </th>
-    </thead>
-    <tbody>
-        <tr>
-        <td>
-        
-        </td>
-        </tr>
-    </tbody>
-</table> -->
+
+<ta>
+<tbody>
+<tr>
+<td>Açãoo</td>
+<td>Usuário</td>
+<td>Categoria</td>
+<td>Produto</td>
+<td></td>
+</tr>
+<tr>
+<td>criar</td>
+<td>/user/add</td>
+<td>/category/add</td>
+<td>
+<div>
+<div>/product/add</div>
+</div>
+</td>
+<td></td>
+</tr>
+<tr>
+<td>atualizar</td>
+<td>/user/alterSenha</td>
+<td>/category/alter</td>
+<td>
+<div>
+<div>/product/alter</div>
+</div>
+</td>
+<td></td>
+</tr>
+<tr>
+<td>apagar</td>
+<td>/user/delete</td>
+<td>
+<div>
+<div>/category/delete</div>
+</div>
+</td>
+<td>/product/delete</td>
+<td></td>
+</tr>
+<tr>
+<td>login</td>
+<td>/user/login</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
 
 ### APLICATIVO:
 O app conta com telas de login, cadastro, configurações, tela de produtos e categoria.. e também para cadatrar novos produtos/categorias.
