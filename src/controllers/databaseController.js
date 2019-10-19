@@ -1,6 +1,10 @@
 const sql = require('mssql');
-var host = 'localhost\\SQLEXPRESS', port = "1433", user = 'SA', password = '@Estoque123456789', database = 'db_sistema';
-const connStr = `Server=${host};User Id=${user};Password=${password};Database=${database}`;
+require('dotenv').config();
+
+var user = 'SA', password = '@Estoque123456789', database = 'db_sistema';
+// é uma condição que verifica se está no pc do victor ou não
+// já que no pc do victor não está instalado o sql server...
+const connStr = !process.env.CONFIG_VICTOR ? `mssql://${user}:${password}@localhost/${database}` : `Server=${process.env.HOST};User Id=${user};Password=${process.env.PASSWORD};`;
 
 var connected = false;
 var conn;
@@ -14,13 +18,6 @@ var CREATE_table_tb_operacao = `create table tb_operacao ( cd_operacao int not n
 var CREATE_table_item_produto_transacao = `create table item_produto_transacao ( fk_produto int not null, fk_transacao int not null, qt_produto int not null, vl_preco_vendido float not null, constraint fk_produto foreign key (fk_produto) references tb_produto(cd_produto), constraint fk_transacao foreign key (fk_transacao) references tb_transacao(cd_transacao) );`
 var create_db = [];
 create_db.push( CREATE_database, USE_database, CREATE_table_tb_produto, CREATE_table_tb_categoria, CREATE_table_tb_usuario, CREATE_table_tb_transacao, CREATE_table_tb_operacao, CREATE_table_item_produto_transacao )
-// var EXEC_sp_Login = `EXECUTE sp_Login 'nilson@santos','123';`
-// var EXEC_sp_addUsuario = `EXECUTE sp_addUsuario 'nilson','123','nilson@santos';`
-// var EXEC_sp_AddCategoria = `EXECUTE sp_AddCategoria 'Eletrônicos';`
-// var EXEC_sp_DeleteCategoria = `EXECUTE sp_DeleteCategoria 'Eletrônicos'; `
-// var EXEC_sp_AddProduto = `EXECUTE sp_AddProduto 'Led Azul',10,10,9,2;`
-// var EXEC_sp_AlterProduto = `EXECUTE sp_AlterProduto 2,'Resistor Verde',8,10,20,2;`
-// var EXEC_sp_AddOperacao = `EXECUTE sp_AddOperacao 'Compra';`
 
 // usuario
 var CREATE_sp_Login = `CREATE PROCEDURE sp_Login @NomeEmail varchar(40), @SenhaUsuario varchar(12) as if((select count(cd_usuario) from tb_usuario where nm_email = @NomeEmail and cd_senha = @SenhaUsuario)=1)  begin print 'Usuario Entrou'; end else print 'Usuario Incorreto';`
@@ -51,7 +48,7 @@ procedures.push(CREATE_sp_Login, CREATE_sp_addUsuario, CREATE_sp_AddCategoria, C
 
 module.exports = {
     createDB() {
-        sql.connect(`mssql://${user}:${password}@localhost/${database}`)
+        sql.connect(connStr)
             .then(_conn => {
                 conn = _conn;
                 connected = true;
