@@ -25,7 +25,7 @@ __Endpoints:__
             <td></td>
         </tr>
         <tr>
-            <td>criar</td>
+            <td><strong>Criar</strong></td>
             <td>/user/add</td>
             <td>/category/add</td>
             <td>
@@ -36,7 +36,7 @@ __Endpoints:__
             <td></td>
         </tr>
         <tr>
-            <td>atualizar</td>
+            <td><strong>Atualizar</strong></td>
             <td>/user/alterSenha</td>
             <td>/category/alter</td>
             <td>
@@ -47,7 +47,7 @@ __Endpoints:__
             <td></td>
         </tr>
         <tr>
-            <td>apagar</td>
+            <td><strong>Apagar</strong></td>
             <td>/user/delete</td>
             <td>
                 <div>
@@ -58,7 +58,7 @@ __Endpoints:__
             <td></td>
         </tr>
         <tr>
-            <td>login</td>
+            <td><strong>Login</strong></td>
             <td>/user/login</td>
             <td></td>
             <td></td>
