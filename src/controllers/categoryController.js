@@ -23,7 +23,7 @@ module.exports = {
                     name: req.body.name,
                     newname: req.body.newname
                 }
-                db.execSQLQuery(`EXECUTE sp_AddCategoria '${category.name}', '${category.newname}';`, res)
+                db.execSQLQuery(`EXECUTE sp_AlterCategoria '${category.name}', '${category.newname}';`, res)
             } catch (err) {
                 return res.json({ error: err.message })
             }
