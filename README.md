@@ -25,7 +25,7 @@ __Endpoints:__
             <td></td>
         </tr>
         <tr>
-            <td><strong>Criar</strong></td>
+            <td><strong>Adicionar</strong></td>
             <td>/user/add</td>
             <td>/category/add</td>
             <td>
