@@ -9,7 +9,7 @@ services:
     expose:
       - "1433"
     ports:
-      - "192.168.0.104:1433:1433"
+      - "192.168.0.25:1433:1433"
     restart: always
   server:
     build: .
