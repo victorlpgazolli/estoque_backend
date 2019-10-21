@@ -19,6 +19,7 @@ routes.post('/category/delete', categoryController.categoryAdd);
 routes.post('/product/add', productsController.productAdd);
 routes.post('/product/alter', productsController.productAlter);
 routes.post('/product/delete', productsController.productDelete);
+routes.get('/product/list', productsController.productList);
 
 routes.post('/',(req,res)=>{
     db.execSQLQuery(`${req.body.query};`, res)
