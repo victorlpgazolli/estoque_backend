@@ -7,15 +7,14 @@ module.exports = {
                 var product = {
                     name: req.body.name,
                     valor_atual: req.body.valor_atual,
-                    qnt_atual: req.body.qnt_atual,
                     qnt_min: req.body.qnt_min,
+                    qnt_atual: req.body.qnt_atual,
                     category: req.body.category,
                 }
-                db.execSQLQuery(`EXECUTE sp_AddProduto '${product.name}','${product.valor_atual}','${product.qnt_atual}','${product.qnt_min}','${product.category}';`, res)
+                db.execSQLQuery(`EXECUTE sp_AddProduto '${product.name}','${product.valor_atual}','${product.qnt_min}','${product.qnt_atual}','${product.category}';`, res)
             } catch (err) {
                return res.json({ error: err.message })
             }
-
         } else {
             db.createDB();
         }
@@ -54,5 +53,17 @@ module.exports = {
         } else {
             db.createDB();
         }
-    }
+    },
+    async productList(req, res){
+        if (db.isConnected()) {
+            try {
+                db.execSQLQuery(`SELECT * FROM tb_produto`, res)
+            } catch (err) {
+               return res.json({ error: err.message })
+            }
+
+        } else {
+            db.createDB();
+        }
+    },
 }
