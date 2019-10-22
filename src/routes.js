@@ -4,7 +4,6 @@ const db = require('./controllers/databaseController')
 const userController = require('./controllers/userController')
 const productsController = require('./controllers/productsController')
 const categoryController = require('./controllers/categoryController')
-
 const routes = express.Router();
 
 routes.post('/user/add', userController.userAdd);
