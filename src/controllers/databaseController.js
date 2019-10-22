@@ -10,8 +10,8 @@ var connected = false;
 var conn;
 var CREATE_database = `create database db_sistema;`
 var USE_database = `use db_sistema;`
-var CREATE_table_tb_produto = `create table tb_produto ( cd_produto int identity(1,1) not null primary key, nm_produto varchar(40) not null, vl_produto_atual float(7) not null, qt_produto_min int not null, qt_produto_atual int not null, im_produto varbinary(max), fk_categoria smallint not null, constraint fk_categoria FOREIGN KEY (fk_categoria) references tb_categoria(cd_categoria) );`
-var CREATE_table_tb_categoria = `create table tb_categoria ( cd_categoria smallint primary key identity(1,1) not null, nm_categoria varchar(40) not null );`
+var CREATE_table_tb_produto = `create table tb_produto ( cd_produto int not null primary key identity(1,1), nm_produto varchar(40) not null, vl_produto_atual float(7), qt_produto_min int not null, qt_produto_atual int not null, fk_categoria smallint not null, constraint fk_categoria FOREIGN KEY (fk_categoria) references tb_categoria(cd_categoria) );`
+var CREATE_table_tb_categoria = `create table tb_categoria ( cd_categoria smallint not null primary key identity(1,1), nm_categoria varchar(40) not null );`
 var CREATE_table_tb_usuario = `create table tb_usuario ( cd_usuario int not null primary key identity(1,1), nm_usuario varchar(40), cd_senha varchar(12) not null, nm_email varchar(40) not null );`
 var CREATE_table_tb_transacao = `create table tb_transacao ( cd_transacao int not null primary key identity(1,1), dt_transacao date, fk_operacao int not null, constraint fk_operacao foreign key(fk_operacao) references tb_operacao(cd_operacao) );`
 var CREATE_table_tb_operacao = `create table tb_operacao ( cd_operacao int not null primary key identity(1,1), nm_operacao varchar(40) );`
@@ -31,7 +31,7 @@ var CREATE_sp_AlterCategoria = `CREATE PROCEDURE sp_AlterCategoria @NomeAntigo v
 var CREATE_sp_DeleteCategoria = `CREATE PROCEDURE sp_DeleteCategoria @Nome varchar(40) as delete from tb_categoria where nm_categoria = @Nome;`
 var CREATE_sp_SelectCategoria = `CREATE PROCEDURE sp_SelectCategoria @NomeCategoria varchar(40)='' as select * from tb_categoria where nm_categoria = @NomeCategoria;`
 // produto
-var CREATE_sp_AddProduto = `CREATE PROCEDURE sp_AddProduto @NomeProduto varchar(40)=' ', @ValorAtual float=' ', @QtdMinima int =' ', @QtdAtual int =' ', @Categoria int ='', @Imagem varbinary(max) = null as if((select count(cd_produto) from tb_produto where nm_produto = @NomeProduto)=0) begin if(@QtdAtual >= @QtdMinima) begin insert into tb_produto values (@NomeProduto,@ValorAtual,@QtdMinima,@QtdAtual,@Categoria,@Imagem) print 'Produto Adcionado' end else begin print 'O valor Atual não pode ser menor que o Minimo' end end else begin print 'Produto ja adcionado' end;`
+var CREATE_sp_AddProduto = `CREATE PROCEDURE sp_AddProduto @NomeProduto varchar(40)='', @ValorAtual float= 0, @QtdMinima int = 0, @QtdAtual int = 0, @Categoria int = 0 as if((select count(cd_produto) from tb_produto where nm_produto = @NomeProduto)=0) begin  if(@QtdAtual >= @QtdMinima) begin  insert into tb_produto values (      @NomeProduto,    @ValorAtual,    @QtdMinima,    @QtdAtual,    @Categoria )   print 'Produto Adcionado'     end     else begin print 'O valor Atual não pode ser menor que o Minimo' end  end  else begin print 'Produto ja adcionado'  end;`
 var CREATE_sp_AlterProduto = `CREATE PROCEDURE sp_AlterProduto @codigoProduto int, @NomeProduto varchar(40)='', @ValorAtual float=' ', @QtdMinima int =' ', @QtdAtual int =' ', @Categoria int =' ', @Imagem varbinary(max) = null as update tb_produto set nm_produto = @NomeProduto, vl_produto_atual = @ValorAtual, qt_produto_min = @QtdMinima, qt_produto_atual = @QtdAtual, fk_categoria=@Categoria, im_produto = @Imagem where cd_produto = @codigoProduto;`
 var CREATE_sp_DeleteProduto = `CREATE PROCEDURE sp_DeleteProduto @codigoProduto int as delete tb_produto where cd_produto = @codigoProduto;`
 var CREATE_sp_SelectProduto = `CREATE PROCEDURE sp_SelectProduto @NomeProduto varchar(40)=' ', @ValorAtual float=' ', @QtdMinima int =' ' as select * from tb_produto where nm_produto = @NomeProduto, vl_produto_atual = @ValorAtual, qt_produto_min = @QtdMinima;`
@@ -54,10 +54,10 @@ module.exports = {
                 connected = true;
                 console.log("Conectado");
                 for (var i in create_db) {
-                    // module.exports.execute(create_db[i]) //
+                    // module.exports.execute(create_db[i]) //-->
                 }
                 console.log("Base de dados criada");
-                // module.exports.createProc(); //
+                // module.exports.createProc(); //-->
             })
             .catch(err => console.log("erro! " + err));
     },
