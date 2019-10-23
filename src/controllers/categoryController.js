@@ -46,5 +46,20 @@ module.exports = {
         } else {
             db.createDB();
         }
+    },
+    async categoryId(req, res){
+        if (db.isConnected()) {
+            try {
+                var category = {
+                    id: req.params.id,
+                }
+                db.execSQLQuery(`SELECT * FROM tb_categoria WHERE cd_categoria='${category.id}';`, res)
+            } catch (err) {
+                return res.json({ error: err.message })
+            }
+
+        } else {
+            db.createDB();
+        }
     }
 }
