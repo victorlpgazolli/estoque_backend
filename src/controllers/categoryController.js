@@ -32,7 +32,7 @@ module.exports = {
             db.createDB();
         }
     },
-    async categoryDelete(req, res){
+    async categoryDelete(req, res) {
         if (db.isConnected()) {
             try {
                 var category = {
@@ -47,7 +47,7 @@ module.exports = {
             db.createDB();
         }
     },
-    async categoryId(req, res){
+    async categoryId(req, res) {
         if (db.isConnected()) {
             try {
                 var category = {
@@ -60,6 +60,17 @@ module.exports = {
 
         } else {
             db.createDB();
+        }
+    },
+    async categoryList(req, res) {
+        if (db.isConnected()) {
+            try {
+                db.execSQLQuery(`SELECT * FROM tb_categoria;`, res)
+            } catch (err) {
+                return res.json({ error: err.message })
+            }
+        } else {
+            db.createDB()
         }
     }
 }
