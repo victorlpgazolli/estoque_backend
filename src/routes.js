@@ -14,6 +14,7 @@ routes.post('/user/delete', userController.userDelete);
 routes.post('/category/add', categoryController.categoryAdd);
 routes.post('/category/alter', categoryController.categoryAlter);
 routes.post('/category/delete', categoryController.categoryDelete);
+routes.get('/category/list', categoryController.categoryList);
 routes.get('/category/:id', categoryController.categoryId);
 
 routes.post('/product/add', productsController.productAdd);
