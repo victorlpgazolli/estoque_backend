@@ -11,7 +11,8 @@ module.exports = {
                     qnt_atual: req.body.qnt_atual,
                     category: req.body.category,
                 }
-                db.execSQLQuery(`exec sp_AddProduto '${product.name}','${product.valor_atual}', '${product.qnt_min}' , '${product.qnt_atual}' , '${product.category}'`, res)
+                console.log(product)
+                db.execSQLQuery(`exec sp_AddProduto '${product.name}',${product.valor_atual}, ${product.qnt_min} , ${product.qnt_atual} , ${product.category}`, res)
             } catch (err) {
                return res.json({ error: err.message })
             }
