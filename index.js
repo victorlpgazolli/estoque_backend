@@ -5,7 +5,7 @@ const bodyParser = require('body-parser');
 const db = require('./src/controllers/databaseController')
 require('dotenv').config();
 const routes = require('./src/routes')
-var PORT = process.env.PORT || 3000;
+var PORT = process.env.PORT || 3333;
 function server_config(req, res, next) {
     res.header("Access-Control-Allow-Origin", "*");
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
