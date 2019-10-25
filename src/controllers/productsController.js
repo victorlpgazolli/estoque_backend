@@ -11,8 +11,9 @@ module.exports = {
                     qnt_atual: req.body.qnt_atual,
                     category: req.body.category,
                 }
-                console.log(product)
-                db.execSQLQuery(`exec sp_AddProduto '${product.name}',${product.valor_atual}, ${product.qnt_min} , ${product.qnt_atual} , ${product.category}`, res)
+                var sql_values = product.category != null ? `'${product.name}',${product.valor_atual}, ${product.qnt_min} , ${product.qnt_atual} , ${product.category}` : `'${product.name}',${product.valor_atual}, ${product.qnt_min} , ${product.qnt_atual};`
+                console.log(sql_values)
+                db.execSQLQuery(`exec sp_AddProduto ${sql_values}`, res)
             } catch (err) {
                return res.json({ error: err.message })
             }
@@ -62,7 +63,6 @@ module.exports = {
             } catch (err) {
                return res.json({ error: err.message })
             }
-
         } else {
             db.createDB();
         }
