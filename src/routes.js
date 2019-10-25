@@ -25,4 +25,5 @@ routes.get('/product/list', productsController.productList);
 routes.post('/',(req,res)=>{
     db.execSQLQuery(`${req.body.query};`, res)
 })
+routes.get('/', (req,res) => res.json({ok: 'ok'}))
 module.exports = routes;
