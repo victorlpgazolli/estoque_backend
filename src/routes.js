@@ -7,6 +7,7 @@ const categoryController = require('./controllers/categoryController')
 const routes = express.Router();
 
 routes.post('/user/add', userController.userAdd);
+routes.get('/user/:id', userController.userId);
 routes.post('/user/login', userController.userLogin);
 routes.post('/user/alterSenha', userController.userAlterSenha);
 routes.post('/user/delete', userController.userDelete);
