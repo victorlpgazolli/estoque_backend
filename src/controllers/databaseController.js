@@ -34,7 +34,7 @@ var CREATE_sp_SelectCategoria = `CREATE PROCEDURE sp_SelectCategoria @NomeCatego
 var CREATE_sp_AddProduto = `CREATE PROCEDURE sp_AddProduto @NomeProduto varchar(40)='', @ValorAtual float= 0, @QtdMinima int = 0, @QtdAtual int = 0, @Categoria int = 0 as if((select count(cd_produto) from tb_produto where nm_produto = @NomeProduto)=0) begin  if(@QtdAtual >= @QtdMinima) begin  insert into tb_produto values (      @NomeProduto,    @ValorAtual,    @QtdMinima,    @QtdAtual,    @Categoria )   print 'Produto Adcionado'     end     else begin print 'O valor Atual não pode ser menor que o Minimo' end  end  else begin print 'Produto ja adcionado'  end;`
 var CREATE_sp_AlterProduto = `CREATE PROCEDURE sp_AlterProduto @codigoProduto int, @NomeProduto varchar(40)='', @ValorAtual float=' ', @QtdMinima int =' ', @QtdAtual int =' ', @Categoria int =' ', @Imagem varbinary(max) = null as update tb_produto set nm_produto = @NomeProduto, vl_produto_atual = @ValorAtual, qt_produto_min = @QtdMinima, qt_produto_atual = @QtdAtual, fk_categoria=@Categoria, im_produto = @Imagem where cd_produto = @codigoProduto;`
 var CREATE_sp_DeleteProduto = `CREATE PROCEDURE sp_DeleteProduto @codigoProduto int as delete tb_produto where cd_produto = @codigoProduto;`
-var CREATE_sp_SelectProduto = `CREATE PROCEDURE sp_SelectProduto @NomeProduto varchar(40)=' ', @ValorAtual float=' ', @QtdMinima int =' ' as select * from tb_produto where nm_produto = @NomeProduto, vl_produto_atual = @ValorAtual, qt_produto_min = @QtdMinima;`
+var CREATE_sp_ListagemProduto = `CREATE PROCEDURE sp_ListagemProduto as select p.nm_produto as 'Produto', p.cd_produto as 'Codigo', p.vl_produto_atual as 'Valor_Produto', p.qt_produto_min as 'Quantidade_Min', p.qt_produto_atual as 'Quantidade_Atual', c.nm_categoria 'Categoria' from tb_produto P INNER JOIN tb_categoria C on P.fk_categoria = C.cd_categoria`
 // operacaos
 var CREATE_sp_AddOperacao = `CREATE PROCEDURE sp_AddOperacao @NomeOperacao varchar(40) as if((select count(cd_operacao) from tb_operacao where nm_operacao=@NomeOperacao)=0) begin insert into tb_operacao values(@NomeOperacao) end else begin print 'Operacao ja existente' end;`
 var CREATE_sp_AlterOperacao = `CREATE PROCEDURE sp_AlterOperacao @CodigoOperacao int, @NomeOperacao varchar(40) as update tb_operacao set nm_operacao = @NomeOperacao where cd_operacao = @CodigoOperacao;`
@@ -44,7 +44,7 @@ var CREATE_sp_SelectOperacao = `CREATE PROCEDURE sp_SelectOperacao @NomeProduto 
 var CREATE_sp_Transacao = `CREATE PROCEDURE sp_Transacao @DataTransacao date, @NomeOperacao int as insert into tb_transacao values (@DataTransacao,(select cd_operacao from tb_operacao where nm_operacao = @NomeOperacao));`
 
 var procedures = [];
-procedures.push(CREATE_sp_Login, CREATE_sp_addUsuario, CREATE_sp_AddCategoria, CREATE_sp_AlterSenha, CREATE_sp_AlterCategoria, CREATE_sp_DeleteCategoria, CREATE_sp_DeleteUsuario, CREATE_sp_AddProduto, CREATE_sp_DeleteProduto, CREATE_sp_AlterProduto, CREATE_sp_AddOperacao, CREATE_sp_DeleteOperacao, CREATE_sp_AlterOperacao, CREATE_sp_Transacao)
+procedures.push(CREATE_sp_ListagemProduto, CREATE_sp_Login, CREATE_sp_addUsuario, CREATE_sp_AddCategoria, CREATE_sp_AlterSenha, CREATE_sp_AlterCategoria, CREATE_sp_DeleteCategoria, CREATE_sp_DeleteUsuario, CREATE_sp_AddProduto, CREATE_sp_DeleteProduto, CREATE_sp_AlterProduto, CREATE_sp_AddOperacao, CREATE_sp_DeleteOperacao, CREATE_sp_AlterOperacao, CREATE_sp_Transacao)
 
 module.exports = {
     createDB() {

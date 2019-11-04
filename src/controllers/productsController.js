@@ -47,7 +47,7 @@ module.exports = {
                 var product = {
                     codigo: req.body.codigo,
                 }
-                db.execSQLQuery(`EXECUTE sp_DeleteProduto '${product.codigo}';`, res)
+                db.execSQLQuery(`EXECUTE sp_DeleteProduto '${parseInt(product.codigo)}';`, res)
             } catch (err) {
                return res.json({ error: err.message })
             }
@@ -59,7 +59,7 @@ module.exports = {
     async productList(req, res){
         if (db.isConnected()) {
             try {
-                db.execSQLQuery(`SELECT * FROM tb_produto`, res)
+                db.execSQLQuery(`EXECUTE sp_ListagemProduto`, res)
             } catch (err) {
                return res.json({ error: err.message })
             }
