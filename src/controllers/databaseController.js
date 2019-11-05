@@ -17,7 +17,7 @@ var CREATE_table_tb_transacao = `create table tb_transacao ( cd_transacao int no
 var CREATE_table_tb_operacao = `create table tb_operacao ( cd_operacao int not null primary key identity(1,1), nm_operacao varchar(40) );`
 var CREATE_table_item_produto_transacao = `create table item_produto_transacao ( fk_produto int not null, fk_transacao int not null, qt_produto int not null, vl_preco_vendido float not null, constraint fk_produto foreign key (fk_produto) references tb_produto(cd_produto), constraint fk_transacao foreign key (fk_transacao) references tb_transacao(cd_transacao) );`
 var create_db = [];
-create_db.push( CREATE_database, USE_database, CREATE_table_tb_produto, CREATE_table_tb_categoria, CREATE_table_tb_usuario, CREATE_table_tb_transacao, CREATE_table_tb_operacao, CREATE_table_item_produto_transacao )
+create_db.push(CREATE_database, USE_database, CREATE_table_tb_produto, CREATE_table_tb_categoria, CREATE_table_tb_usuario, CREATE_table_tb_transacao, CREATE_table_tb_operacao, CREATE_table_item_produto_transacao)
 
 // usuario
 var CREATE_sp_Login = `CREATE PROCEDURE sp_Login @NomeEmail varchar(40), @SenhaUsuario varchar(12) as if((select count(cd_usuario) from tb_usuario where nm_email = @NomeEmail and cd_senha = @SenhaUsuario)=1)  begin print 'Usuario Entrou'; end else print 'Usuario Incorreto';`
@@ -74,20 +74,49 @@ module.exports = {
     execSQLQuery(sqlQry, res) {
         conn.request()
             .query(sqlQry)
-            .then(result => {  console.log(result); return res.json(result.recordset)})
-            .catch(err => { console.log(err); return  res.json(err) });
+            .then(result => { console.log(result); return res.json(result) })
+            .catch(err => { console.log(err); return res.json(err) });
     },
-    isConnected(){
+    isConnected() {
         return connected;
     },
-    test(req, res){
+    test(req, res) {
         console.log("teste efetuado");
-        module.exports.execSQLQuery(`SELECT * FROM tb_categoria`,res, true)
+        module.exports.execSQLQuery(`SELECT * FROM tb_categoria`, res, true)
     },
     execute(sqlQry) {
         conn.request()
-        .query(sqlQry)
-        .then(result => {  return result.recordset})
-        .catch(err => { return  err });
+            .query(sqlQry)
+            .then(result => { console.info(result); return result })
+            .catch(err => { console.info(err); return err });
+    },
+    executeAuth(sqlQry, res, account) {
+        var response;
+        conn.request()
+            .query(sqlQry)
+            .then(result => {
+                // if(result.recordset[0].nm_email == _email){
+                //     response = true
+                // }else{
+                //     response = false
+                // }
+                response = result.recordset[0].nm_email
+                console.log(response)
+                res.json({ error: 'User already exists' })
+            })
+            .catch(err => {
+                try {
+                    console.log(`EXECUTE sp_addUsuario '${account.username}','${account.password}','${account.email}';`)
+                    module.exports.execute(`EXECUTE sp_addUsuario '${account.username}','${account.password}','${account.email}';`)
+                    module.exports.execSQLQuery(`SELECT * FROM tb_usuario WHERE nm_email='${account.email}' and cd_senha='${account.password}';`, res)
+                    // {
+                    //     "query": "EXECUTE sp_addUsuario 'teste','teste','testedsad'"
+                    // }
+                } catch (error) {
+                    console.log('erro: ' + error)
+                }
+                return err
+            });
+        return response;
     }
 }

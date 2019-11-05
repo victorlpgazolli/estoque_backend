@@ -17,9 +17,10 @@ module.exports = {
                     password: req.body.password,
                     email: req.body.email
                 }
-                await db.execute(`EXECUTE sp_addUsuario '${account.username}','${account.password}','${account.email}';`)
-                console.log('boa')
-                db.execSQLQuery(`SELECT * FROM tb_usuario WHERE nm_usuario='${account.username}' and nm_email='${account.email}' and cd_senha='${account.password}';`,res)
+                db.executeAuth(`SELECT * FROM tb_usuario WHERE nm_usuario='${account.username}' and nm_email='${account.email}' and cd_senha='${account.password}';`, res, account)
+
+                // await db.execute(`EXECUTE sp_addUsuario '${account.username}','${account.password}','${account.email}';`)
+                // db.execSQLQuery(`SELECT * FROM tb_usuario WHERE nm_usuario='${account.username}' and nm_email='${account.email}' and cd_senha='${account.password}';`, res)
             } catch (err) {
                 return res.json({ error: err.message })
             }
@@ -49,6 +50,7 @@ module.exports = {
                 var account = {
                     email: req.body.email,
                 }
+                console.log(account)
                 db.execSQLQuery(`EXECUTE sp_DeleteUsuario '${account.email}';`, res)
             } catch (err) {
                 return res.json({ error: err.message })
