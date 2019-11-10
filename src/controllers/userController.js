@@ -51,7 +51,7 @@ module.exports = {
                     email: req.body.email,
                 }
                 console.log(account)
-                db.execSQLQuery(`EXECUTE sp_DeleteUsuario '${account.email}';`, res)
+                db.execSQLQuery(`EXECUTE sp_DesativaUsuario '${account.email}';`, res)
             } catch (err) {
                 return res.json({ error: err.message })
             }

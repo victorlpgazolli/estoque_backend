@@ -11,16 +11,14 @@ module.exports = {
                     qnt_atual: req.body.qnt_atual,
                     category: req.body.category,
                 }
-                var sql_values = product.category != null ? `'${product.name}',${product.valor_atual}, ${product.qnt_min} , ${product.qnt_atual} , ${product.category}` : `'${product.name}',${product.valor_atual}, ${product.qnt_min} , ${product.qnt_atual};`
-                console.log(sql_values)
-                db.execSQLQuery(`exec sp_AddProduto ${sql_values}`, res)
+                db.execSQLQuery(`exec sp_AddProduto '${product.name}',${product.valor_atual}, ${product.qnt_min} , ${product.qnt_atual} , ${product.category}`, '1', res)
             } catch (err) {
-               return res.json({ error: err.message })
+                return res.json({ error: err.message })
             }
         } else {
             db.createDB();
         }
-    }, 
+    },
     async productAlter(req, res) {
         if (db.isConnected()) {
             try {
@@ -34,34 +32,34 @@ module.exports = {
                 }
                 db.execSQLQuery(`EXECUTE sp_AlterProduto '${product.codigo}', '${product.name}', '${product.valor_atual}', '${product.qnt_min}', '${product.qnt_atual}', '${product.category}';`, res)
             } catch (err) {
-               return res.json({ error: err.message })
+                return res.json({ error: err.message })
             }
 
         } else {
             db.createDB();
         }
     },
-    async productDelete(req, res){
+    async productDelete(req, res) {
         if (db.isConnected()) {
             try {
                 var product = {
                     codigo: req.body.codigo,
                 }
-                db.execSQLQuery(`EXECUTE sp_DeleteProduto '${parseInt(product.codigo)}';`, res)
+                db.execSQLQuery(`EXECUTE sp_DesativarProduto '${parseInt(product.codigo)}';`, res)
             } catch (err) {
-               return res.json({ error: err.message })
+                return res.json({ error: err.message })
             }
 
         } else {
             db.createDB();
         }
     },
-    async productList(req, res){
+    async productList(req, res) {
         if (db.isConnected()) {
             try {
                 db.execSQLQuery(`EXECUTE sp_ListagemProduto`, res)
             } catch (err) {
-               return res.json({ error: err.message })
+                return res.json({ error: err.message })
             }
         } else {
             db.createDB();
