@@ -10,12 +10,12 @@ var connected = false;
 var conn;
 var CREATE_database = `create database db_sistema;`
 var USE_database = `use db_sistema;` //
-var CREATE_table_tb_categoria = `create table tb_categoria ( cd_categoria smallint not null primary key identity(1,1), nm_categoria varchar(40) not null );`
-var CREATE_table_tb_produto = `create table tb_produto ( cd_produto int not null primary key identity(1,1), nm_produto varchar(40) not null, vl_produto_atual float(7), qt_produto_min int not null, qt_produto_atual int not null, tp_status_produto bit not null, fk_categoria smallint not null, constraint fk_categoria FOREIGN KEY (fk_categoria) references tb_categoria(cd_categoria))`
-var CREATE_table_tb_transacao = `create table tb_transacao ( cd_transacao int not null primary key identity(1,1), dt_transacao date, fk_operacao int not null, constraint fk_operacao foreign key(fk_operacao) references tb_operacao(cd_operacao) );`
-var CREATE_table_tb_usuario = `create table tb_usuario ( cd_usuario int not null primary key identity(1,1), nm_usuario varchar(40), cd_senha varchar(12) not null, nm_email varchar(40) not null, cd_status_usuario bit not null );`
-var CREATE_table_tb_operacao = `create table tb_operacao ( cd_operacao int not null primary key identity(1,1), nm_operacao varchar(40) );`
-var CREATE_table_item_produto_transacao = `create table item_produto_transacao ( fk_produto int not null, fk_transacao int not null, qt_produto int not null, vl_preco_vendido float not null, constraint fk_produto foreign key (fk_produto) references tb_produto(cd_produto), constraint fk_transacao foreign key (fk_transacao) references tb_transacao(cd_transacao) );`
+var CREATE_table_tb_categoria = `CREATE table tb_categoria ( cd_categoria smallint not null primary key identity(1,1), nm_categoria varchar(40) not null );`
+var CREATE_table_tb_produto = `CREATE table tb_produto ( cd_produto int not null primary key identity(1,1), nm_produto varchar(40) not null, vl_produto_atual float(7), qt_produto_min int not null, qt_produto_atual int not null, tp_status_produto bit not null, fk_categoria smallint not null, constraint fk_categoria FOREIGN KEY (fk_categoria) references tb_categoria(cd_categoria))`
+var CREATE_table_tb_transacao = `CREATE table tb_transacao ( cd_transacao int not null primary key identity(1,1), dt_transacao date, fk_operacao int not null, constraint fk_operacao foreign key(fk_operacao) references tb_operacao(cd_operacao) );`
+var CREATE_table_tb_usuario = `CREATE table tb_usuario ( cd_usuario int not null primary key identity(1,1), nm_usuario varchar(40), cd_senha varchar(12) not null, nm_email varchar(40) not null, cd_status_usuario bit not null );`
+var CREATE_table_tb_operacao = `CREATE table tb_operacao ( cd_operacao int not null primary key identity(1,1), nm_operacao varchar(40) );`
+var CREATE_table_item_produto_transacao = `CREATE table item_produto_transacao ( fk_produto int not null, fk_transacao int not null, qt_produto int not null, vl_preco_vendido float not null, constraint fk_produto foreign key (fk_produto) references tb_produto(cd_produto), constraint fk_transacao foreign key (fk_transacao) references tb_transacao(cd_transacao) );`
 var create_db = [];
 create_db.push(CREATE_database, USE_database, CREATE_table_tb_produto, CREATE_table_tb_categoria, CREATE_table_tb_usuario, CREATE_table_tb_transacao, CREATE_table_tb_operacao, CREATE_table_item_produto_transacao)
 
@@ -45,10 +45,14 @@ var CREATE_sp_AlterOperacao = `CREATE PROCEDURE sp_AlterOperacao @CodigoOperacao
 var CREATE_sp_DeleteOperacao = `CREATE PROCEDURE sp_DeleteOperacao @Codigo int as delete tb_operacao where cd_operacao = @Codigo;`
 
 // transaçao
+var CREATE_sp_FazerOperacao = `CREATE PROCEDURE sp_AttEstoque @QtdProduto int, @idProduto int, @TipoTransacao varchar(20)  as if(@TipoTransacao = 'compra')  begin    insert into tb_transacao values ((select getdate()), (select cd_operacao from tb_operacao where nm_operacao = @TipoTransacao)); update tb_produto set qt_produto_atual = qt_produto_atual + @QtdProduto where cd_produto = @idProduto; insert into item_produto_transacao values (@idProduto, (select max(cd_transacao) from tb_transacao), @QtdProduto, (select vl_produto_atual from tb_produto where cd_produto = @idProduto)); end  else  begin if((select qt_produto_atual from tb_produto where cd_produto = @idProduto) - @QtdProduto > 0)  begin insert into tb_transacao values ((select getdate()), (select cd_operacao from tb_operacao where nm_operacao = @TipoTransacao)); update tb_produto set qt_produto_atual = qt_produto_atual - @QtdProduto where cd_produto = @idProduto; insert into item_produto_transacao values (@idProduto, (select max(cd_transacao) from tb_transacao), @QtdProduto, (select vl_produto_atual from tb_produto where cd_produto = @idProduto)) end  else  begin print 'Quantidade indisponível no estoque'  end end;`
+// var CREATE_sp_FazerOperacao = `CREATE PROCEDURE sp_AttEstoque @QtdProduto int, @idProduto int, @TipoTransacao varchar(20) as if(@TipoTransacao == 'Venda') begin insert into tb_transacao values ((select getdate()),(select cd_operacao from tb_operacao where nm_operacao = @TipoTransacao)) update tb_produto set qt_produto_atual = qt_produto_atual - @QtdProduto where cd_produto = @idProduto insert into item_produto_transacao values(@idProduto, (select max(cd_transacao) from tb_transacao), @QtdProduto, (select vl_produto_atual from tb_produto where cd_produto = @idProduto)) end else begin if((select qt_produto_atual from tb_produto where cd_produto = @idProduto)-@QtdProduto >0) begin insert into tb_transacao values ((select getdate()),(select cd_operacao from tb_operacao where nm_operacao = @TipoTransacao)) update tb_produto set qt_produto_atual = qt_produto_atual + @QtdProduto where cd_produto = @idProduto insert into item_produto_transacao values(@idProduto, (select max(cd_transacao) from tb_transacao), @QtdProduto, (select vl_produto_atual from tb_produto where cd_produto = @idProduto)) end else begin print 'Quantidade acima do estoque' end end`
+
+// OLD transaçao
 var CREATE_sp_Transacao = `CREATE PROCEDURE sp_Transacao @DataTransacao date, @NomeOperacao int as insert into tb_transacao values (@DataTransacao,(select cd_operacao from tb_operacao where nm_operacao = @NomeOperacao));`
 
 var procedures = [];
-procedures.push(CREATE_sp_ListagemProduto, CREATE_sp_addUsuario, CREATE_sp_AddCategoria, CREATE_sp_AlterSenha, CREATE_sp_AlterCategoria, CREATE_sp_DeleteCategoria, CREATE_sp_DeleteUsuario, CREATE_sp_AddProduto, CREATE_sp_AlterProduto, CREATE_sp_AddOperacao, CREATE_sp_DeleteOperacao, CREATE_sp_AlterOperacao, CREATE_sp_Transacao, CREATE_sp_DeleteProduto)
+procedures.push(CREATE_sp_ListagemProduto, CREATE_sp_addUsuario, CREATE_sp_AddCategoria, CREATE_sp_AlterSenha, CREATE_sp_AlterCategoria, CREATE_sp_DeleteCategoria, CREATE_sp_DeleteUsuario, CREATE_sp_AddProduto, CREATE_sp_AlterProduto, CREATE_sp_AddOperacao, CREATE_sp_DeleteOperacao, CREATE_sp_AlterOperacao, CREATE_sp_Transacao, CREATE_sp_DeleteProduto, CREATE_sp_FazerOperacao)
 
 module.exports = {
     createDB() {
@@ -78,8 +82,8 @@ module.exports = {
     execSQLQuery(sqlQry, res) {
         conn.request()
             .query(sqlQry)
-            .then(result => { console.log(result); return res.json(result) })
-            .catch(err => { console.log(err); return res.json(err) });
+            .then(result => { console.log(result); return res.status(200).json(result) })
+            .catch(err => { console.log(err); return res.status(400).json(err) });
     },
     isConnected() {
         return connected;

@@ -31,3 +31,28 @@ CREATE PROCEDURE sp_DeleteOperacao @Codigo int as delete tb_operacao where cd_op
 CREATE PROCEDURE sp_SelectOperacao @NomeProduto varchar(40)=' ', @ValorAtual float=' ', @QtdMinima int =' ' as select * from tb_produto where nm_produto = @NomeProduto, vl_produto_atual = @ValorAtual, qt_produto_min = @QtdMinima;
 --transaçao
 CREATE PROCEDURE sp_Transacao @DataTransacao date, @NomeOperacao int as insert into tb_transacao values (@DataTransacao,(select cd_operacao from tb_operacao where nm_operacao = @NomeOperacao));
+
+
+CREATE PROCEDURE sp_AttEstoque @QtdProduto int, @idProduto int, @TipoTransacao varchar(20) 
+as if(@TipoTransacao = 'compra') 
+        begin   
+                insert into tb_transacao values ((select getdate()), (select cd_operacao from tb_operacao where nm_operacao = @TipoTransacao));
+                update tb_produto set qt_produto_atual = qt_produto_atual + @QtdProduto where cd_produto = @idProduto;
+                insert into item_produto_transacao values (@idProduto, (select max(cd_transacao) from tb_transacao), @QtdProduto, (select vl_produto_atual from tb_produto where cd_produto = @idProduto));
+        end 
+    else 
+    begin
+        if((select qt_produto_atual from tb_produto where cd_produto = @idProduto) - @QtdProduto > 0) 
+            begin
+                insert into tb_transacao values ((select getdate()), (select cd_operacao from tb_operacao where nm_operacao = @TipoTransacao));
+                update tb_produto set qt_produto_atual = qt_produto_atual - @QtdProduto where cd_produto = @idProduto;
+                insert into item_produto_transacao values (@idProduto, (select max(cd_transacao) from tb_transacao), @QtdProduto, (select vl_produto_atual from tb_produto where cd_produto = @idProduto))
+            end 
+        else 
+            begin
+                print 'Quantidade indisponível no estoque' 
+            end
+    end
+
+
+CREATE PROCEDURE sp_AttEstoque @QtdProduto int, @idProduto int, @TipoTransacao varchar(20)  as if(@TipoTransacao = 'compra')  begin    insert into tb_transacao values ((select getdate()), (select cd_operacao from tb_operacao where nm_operacao = @TipoTransacao)); update tb_produto set qt_produto_atual = qt_produto_atual + @QtdProduto where cd_produto = @idProduto; insert into item_produto_transacao values (@idProduto, (select max(cd_transacao) from tb_transacao), @QtdProduto, (select vl_produto_atual from tb_produto where cd_produto = @idProduto)); end  else  begin if((select qt_produto_atual from tb_produto where cd_produto = @idProduto) - @QtdProduto > 0)  begin insert into tb_transacao values ((select getdate()), (select cd_operacao from tb_operacao where nm_operacao = @TipoTransacao)); update tb_produto set qt_produto_atual = qt_produto_atual + @QtdProduto where cd_produto = @idProduto; insert into item_produto_transacao values (@idProduto, (select max(cd_transacao) from tb_transacao), @QtdProduto, (select vl_produto_atual from tb_produto where cd_produto = @idProduto)) end  else  begin print 'Quantidade indisponível no estoque'  end end;

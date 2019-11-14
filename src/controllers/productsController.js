@@ -1,6 +1,23 @@
 const db = require('./databaseController');
 
 module.exports = {
+    async productOperation(req, res) {
+        if (db.isConnected()) {
+            try {
+                var product = {
+                    qnt: req.body.qnt,
+                    id: req.body.id,
+                    typeTransaction: req.body.type,
+                }
+                console.log(product)
+                db.execSQLQuery(`exec sp_AttEstoque '${product.qnt}',${product.id}, ${product.typeTransaction};`, res)
+            } catch (err) {
+                return res.json({ error: err.message })
+            }
+        } else {
+            db.createDB();
+        }
+    },
     async productAdd(req, res) {
         if (db.isConnected()) {
             try {
@@ -11,7 +28,7 @@ module.exports = {
                     qnt_atual: req.body.qnt_atual,
                     category: req.body.category,
                 }
-                db.execSQLQuery(`exec sp_AddProduto '${product.name}',${product.valor_atual}, ${product.qnt_min} , ${product.qnt_atual} , ${product.category}`, '1', res)
+                db.execSQLQuery(`exec sp_AddProduto '${product.name}',${product.valor_atual}, ${product.qnt_min} , ${product.qnt_atual} , ${product.category}`, res)
             } catch (err) {
                 return res.json({ error: err.message })
             }
