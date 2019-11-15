@@ -9,7 +9,7 @@ create table tb_operacao ( cd_operacao int not null primary key identity(1,1), n
 create table item_produto_transacao ( fk_produto int not null, fk_transacao int not null, qt_produto int not null, vl_preco_vendido float not null, constraint fk_produto foreign key (fk_produto) references tb_produto(cd_produto), constraint fk_transacao foreign key (fk_transacao) references tb_transacao(cd_transacao) );
 
 --usuario
-CREATE PROCEDURE sp_Login @NomeEmail varchar(40), @SenhaUsuario varchar(12) as if((select count(cd_usuario) from tb_usuario where nm_email = @NomeEmail and cd_senha = @SenhaUsuario)=1)  begin print 'Usuario Entrou'; end else print 'Usuario Incorreto';
+CREATE PROCEDURE sp_Login @NomeEmail varchar(40), @SenhaUsuario varchar(12) as if((select count(cd_usuario) from tb_usuario where nm_email = @NomeEmail and cd_senha = @SenhaUsuario)=1) begin print 'Usuario Entrou'; end else print 'Usuario Incorreto';
 CREATE PROCEDURE sp_addUsuario @Nome varchar (40), @Senha varchar (40), @Email varchar (12) as if((select count(nm_email) from tb_usuario where nm_email = @Email)>0) begin print 'Usuario Existente' end else if(@Email = '') begin print 'Email nao pode ser vazio' end else begin insert into tb_usuario values (@Nome,@Senha,@Email) print 'Usuario Cadastrado' end;
 CREATE PROCEDURE sp_DeleteUsuario @Email varchar(40) as delete from tb_usuario where nm_email = @Email; 
 CREATE PROCEDURE sp_AlterSenha @Email varchar(40), @SenhaAntiga varchar(40), @SenhaNova varchar(40) as update tb_usuario set cd_sen = @SenhaNova where cd_senha = @SenhaAntiga and nm_email = @Email; 
@@ -33,12 +33,12 @@ CREATE PROCEDURE sp_SelectOperacao @NomeProduto varchar(40)=' ', @ValorAtual flo
 CREATE PROCEDURE sp_Transacao @DataTransacao date, @NomeOperacao int as insert into tb_transacao values (@DataTransacao,(select cd_operacao from tb_operacao where nm_operacao = @NomeOperacao));
 
 
-CREATE PROCEDURE sp_AttEstoque @QtdProduto int, @idProduto int, @TipoTransacao varchar(20) 
+CREATE PROCEDURE sp_AttEstoque @QtdProduto int, @idProduto int, @TipoTransacao varchar(20), @idUsuario int
 as if(@TipoTransacao = 'compra') 
         begin   
                 insert into tb_transacao values ((select getdate()), (select cd_operacao from tb_operacao where nm_operacao = @TipoTransacao));
                 update tb_produto set qt_produto_atual = qt_produto_atual + @QtdProduto where cd_produto = @idProduto;
-                insert into item_produto_transacao values (@idProduto, (select max(cd_transacao) from tb_transacao), @QtdProduto, (select vl_produto_atual from tb_produto where cd_produto = @idProduto));
+                insert into item_produto_transacao values (@idProduto, (select max(cd_transacao) from tb_transacao), @QtdProduto, (select vl_produto_atual from tb_produto where cd_produto = @idProduto), @idUsuario);
         end 
     else 
     begin
@@ -46,7 +46,7 @@ as if(@TipoTransacao = 'compra')
             begin
                 insert into tb_transacao values ((select getdate()), (select cd_operacao from tb_operacao where nm_operacao = @TipoTransacao));
                 update tb_produto set qt_produto_atual = qt_produto_atual - @QtdProduto where cd_produto = @idProduto;
-                insert into item_produto_transacao values (@idProduto, (select max(cd_transacao) from tb_transacao), @QtdProduto, (select vl_produto_atual from tb_produto where cd_produto = @idProduto))
+                insert into item_produto_transacao values (@idProduto, (select max(cd_transacao) from tb_transacao), @QtdProduto, (select vl_produto_atual from tb_produto where cd_produto = @idProduto), @idUsuario)
             end 
         else 
             begin
@@ -55,4 +55,4 @@ as if(@TipoTransacao = 'compra')
     end
 
 
-CREATE PROCEDURE sp_AttEstoque @QtdProduto int, @idProduto int, @TipoTransacao varchar(20)  as if(@TipoTransacao = 'compra')  begin    insert into tb_transacao values ((select getdate()), (select cd_operacao from tb_operacao where nm_operacao = @TipoTransacao)); update tb_produto set qt_produto_atual = qt_produto_atual + @QtdProduto where cd_produto = @idProduto; insert into item_produto_transacao values (@idProduto, (select max(cd_transacao) from tb_transacao), @QtdProduto, (select vl_produto_atual from tb_produto where cd_produto = @idProduto)); end  else  begin if((select qt_produto_atual from tb_produto where cd_produto = @idProduto) - @QtdProduto > 0)  begin insert into tb_transacao values ((select getdate()), (select cd_operacao from tb_operacao where nm_operacao = @TipoTransacao)); update tb_produto set qt_produto_atual = qt_produto_atual + @QtdProduto where cd_produto = @idProduto; insert into item_produto_transacao values (@idProduto, (select max(cd_transacao) from tb_transacao), @QtdProduto, (select vl_produto_atual from tb_produto where cd_produto = @idProduto)) end  else  begin print 'Quantidade indisponível no estoque'  end end;
+CREATE PROCEDURE sp_AttEstoque @QtdProduto int, @idProduto int, @TipoTransacao varchar(20), @idUsuario int as if(@TipoTransacao = 'compra')  begin insert into tb_transacao values ((select getdate()), (select cd_operacao from tb_operacao where nm_operacao = @TipoTransacao)); update tb_produto set qt_produto_atual = qt_produto_atual + @QtdProduto where cd_produto = @idProduto; insert into item_produto_transacao values (@idProduto, (select max(cd_transacao) from tb_transacao), @QtdProduto, (select vl_produto_atual from tb_produto where cd_produto = @idProduto), @idUsuario); end else begin if((select qt_produto_atual from tb_produto where cd_produto = @idProduto) - @QtdProduto > 0) begin insert into tb_transacao values ((select getdate()), (select cd_operacao from tb_operacao where nm_operacao = @TipoTransacao)); update tb_produto set qt_produto_atual = qt_produto_atual - @QtdProduto where cd_produto = @idProduto; insert into item_produto_transacao values (@idProduto, (select max(cd_transacao) from tb_transacao), @QtdProduto, (select vl_produto_atual from tb_produto where cd_produto = @idProduto), @idUsuario) end  else begin print 'Quantidade indisponível no estoque' end end
