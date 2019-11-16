@@ -24,6 +24,8 @@ routes.post('/product/delete', productsController.productDelete);
 routes.get('/product/list', productsController.productList);
 routes.post('/product/operation', productsController.productOperation);
 routes.post('/product/operation/list', productsController.productListOperations);
+routes.get('/product/buyOrder/list', productsController.productListBuyOrder);
+routes.post('/product/buyOrder/delete', productsController.productDeleteBuyOrder);
 
 routes.post('/', (req, res) => {
     db.execSQLQuery(`${req.body.query};`, res)

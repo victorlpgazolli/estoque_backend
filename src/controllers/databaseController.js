@@ -40,10 +40,11 @@ var CREATE_sp_DeleteOperacao = `CREATE PROCEDURE sp_DeleteOperacao @Codigo int a
 
 // transaçao
 var CREATE_sp_FazerOperacao = `CREATE PROCEDURE sp_AttEstoque @QtdProduto int, @idProduto int, @TipoTransacao varchar(20), @idUsuario int as if(@TipoTransacao = 'compra')  begin insert into tb_transacao values ((select getdate()), (select cd_operacao from tb_operacao where nm_operacao = @TipoTransacao)); update tb_produto set qt_produto_atual = qt_produto_atual + @QtdProduto where cd_produto = @idProduto; insert into item_produto_transacao values (@idProduto, (select max(cd_transacao) from tb_transacao), @QtdProduto, (select vl_produto_atual from tb_produto where cd_produto = @idProduto), @idUsuario); end else begin if((select qt_produto_atual from tb_produto where cd_produto = @idProduto) - @QtdProduto > 0) begin insert into tb_transacao values ((select getdate()), (select cd_operacao from tb_operacao where nm_operacao = @TipoTransacao)); update tb_produto set qt_produto_atual = qt_produto_atual - @QtdProduto where cd_produto = @idProduto; insert into item_produto_transacao values (@idProduto, (select max(cd_transacao) from tb_transacao), @QtdProduto, (select vl_produto_atual from tb_produto where cd_produto = @idProduto), @idUsuario) end  else begin print 'Quantidade indisponível no estoque' end end`
-var CREATE_tg_checkMinQntProducts = `CREATE TRIGGER checkMinQntProducts on tb_produto FOR UPDATE as if ((select qt_produto_atual from inserted) < (select qt_produto_min from inserted)) begin  insert into tb_ordem_compra values ((select cd_produto from inserted), ((select qt_produto_atual from inserted) - (select qt_produto_min from inserted))) end`
+var CREATE_tg_checkMinQntProducts = `create TRIGGER estoqueMinimo on tb_produto FOR UPDATE as if (select qt_produto_atual from inserted) < (select qt_produto_min from inserted) begin insert into tb_ordem_compra values ((select cd_produto from inserted),(select qt_produto_min from inserted)-(select qt_produto_atual from inserted),1) end`
 
-var procedures = [];
+var procedures = [], triggers = [];
 procedures.push(CREATE_sp_ListagemProduto, CREATE_sp_addUsuario, CREATE_sp_AddCategoria, CREATE_sp_AlterSenha, CREATE_sp_AlterCategoria, CREATE_sp_DeleteCategoria, CREATE_sp_DeleteUsuario, CREATE_sp_AddProduto, CREATE_sp_AlterProduto, CREATE_sp_AddOperacao, CREATE_sp_DeleteOperacao, CREATE_sp_AlterOperacao, CREATE_sp_DeleteProduto, CREATE_sp_FazerOperacao)
+triggers.push(CREATE_tg_checkMinQntProducts)
 
 module.exports = {
     createDB() {
@@ -55,6 +56,8 @@ module.exports = {
                 for (var i in create_db) {
                     // module.exports.execute(create_db[i]) //-->
                 }
+                // module.exports.execute(`insert into tb_operacao values ('compra');`)//-->
+                // module.exports.execute(`insert into tb_operacao values ('venda');`)//-->
                 console.log("Base de dados criada");
                 // module.exports.createProc(); //-->
             })
@@ -65,7 +68,10 @@ module.exports = {
             for (var i in procedures) {
                 module.exports.execute(procedures[i])
             }
-            console.log("Stored Procedures criados");
+            for (var i in triggers) {
+                module.exports.execute(triggers[i])
+            }
+            console.log("Stored Procedures e Triggers criados");
         } else {
             module.exports.createDB();
         }

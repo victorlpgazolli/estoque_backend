@@ -1,6 +1,31 @@
 const db = require('./databaseController');
 //
 module.exports = {
+    async productDeleteBuyOrder(req, res) {
+        if (db.isConnected()) {
+            try {
+                var buyOrder = {
+                    id: req.body.id,
+                }
+                db.execSQLQuery(`update tb_ordem_compra set tp_status_ordem = 0 where cd_ordem_compra = ${buyOrder.id}`, res)
+            } catch (err) {
+                return res.json({ error: err.message })
+            }
+        } else {
+            db.createDB();
+        }
+    },
+    async productListBuyOrder(req, res) {
+        if (db.isConnected()) {
+            try {
+                db.execSQLQuery(`select O.cd_ordem_compra as 'codigo', P.nm_produto as 'produto', O.qt_produto as 'quantidade', O.tp_status_ordem as 'status'  from tb_ordem_compra O INNER JOIN tb_produto P on O.fk_produto_compra = P.cd_produto`, res)
+            } catch (err) {
+                return res.json({ error: err.message })
+            }
+        } else {
+            db.createDB();
+        }
+    },
     async productListOperations(req, res) {
         if (db.isConnected()) {
             try {
@@ -24,8 +49,8 @@ module.exports = {
                     typeTransaction: req.body.type,
                     userId: req.body.userId,
                 }
-                console.log(product)
-                db.execSQLQuery(`exec sp_AttEstoque '${product.qnt}',${product.id}, ${product.typeTransaction}, ${product.userId}`, res)
+                // return res.status(200).json({ response: `exec sp_AttEstoque '${product.qnt}',${product.id}, ${product.typeTransaction}, ${product.userId}` })
+                db.execSQLQuery(`exec sp_AttEstoque ${product.qnt},${product.id}, ${product.typeTransaction}, ${product.userId}`, res)
             } catch (err) {
                 return res.json({ error: err.message })
             }
@@ -43,7 +68,7 @@ module.exports = {
                     qnt_atual: req.body.qnt_atual,
                     category: req.body.category,
                 }
-                db.execSQLQuery(`exec sp_AddProduto '${product.name}',${product.valor_atual}, ${product.qnt_min} , ${product.qnt_atual} , ${product.category}`, res)
+                db.execSQLQuery(`exec sp_AddProduto '${product.name}',${product.valor_atual}, ${product.qnt_min} , ${product.qnt_atual} , ${product.category}, 1`, res)
             } catch (err) {
                 return res.json({ error: err.message })
             }
@@ -62,7 +87,7 @@ module.exports = {
                     qnt_atual: req.body.qnt_atual,
                     category: req.body.category
                 }
-                db.execSQLQuery(`EXECUTE sp_AlterProduto '${product.codigo}', '${product.name}', '${product.valor_atual}', '${product.qnt_min}', '${product.qnt_atual}', '${product.category}';`, res)
+                db.execSQLQuery(`EXECUTE sp_AlterProduto '${product.codigo}', '${product.name}', '${product.valor_atual}', '${product.qnt_min}', '${product.qnt_atual}', '${product.category}', 1;`, res)
             } catch (err) {
                 return res.json({ error: err.message })
             }
